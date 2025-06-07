@@ -1,38 +1,32 @@
-'use client'; 
+'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation'; // useSearchParams をインポート
-import Link from 'next/link'; // Linkをインポート
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import * as apiClient from '@/lib/apiClient';
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter();
-  const searchParams = useSearchParams(); // searchParamsフックを使用
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null); // ★成功メッセージ用のStateを追加
   const [isLoading, setIsLoading] = useState(false);
-
-  // ★ページ読み込み時に、URLに?registered=trueがあればメッセージを表示
-  useEffect(() => {
-    if (searchParams.get('registered') === 'true') {
-      setSuccessMessage('ユーザー登録が完了しました。ログインしてください。');
-    }
-  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
-    setSuccessMessage(null); // メッセージをリセット
     setIsLoading(true);
 
     try {
-      const data = await apiClient.login(username, password);
-      localStorage.setItem('accessToken', data.access_token);
-      router.push('/');
-    } catch (err) {
-      setError('ユーザー名またはパスワードが正しくありません。');
+      // APIクライアントを使ってユーザー登録処理を実行
+      await apiClient.register(username, password);
+
+      // 登録成功後、ログインページにメッセージ付きでリダイレクト
+      router.push('/login?registered=true');
+
+    } catch (err: any) {
+      // ユーザー名重複などのエラーメッセージをstateに保存して表示
+      setError(err.message || '登録に失敗しました。');
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -42,13 +36,8 @@ export default function LoginPage() {
   return (
     <main className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6 text-center">ログイン</h1>
-        
-        {/* ★成功メッセージの表示エリア */}
-        {successMessage && <p className="bg-green-100 text-green-700 p-3 rounded mb-4 text-sm">{successMessage}</p>}
-
+        <h1 className="text-2xl font-bold mb-6 text-center">新規登録</h1>
         <form onSubmit={handleSubmit}>
-          {/* ... (フォームのinput部分は変更なし) ... */}
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
               ユーザー名
@@ -80,18 +69,16 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full disabled:bg-gray-400"
+              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full disabled:bg-gray-400"
             >
-              {isLoading ? 'ログイン中...' : 'ログイン'}
+              {isLoading ? '登録中...' : '登録する'}
             </button>
           </div>
         </form>
-
-        {/* ★新規登録ページへのリンクを追加 */}
         <p className="text-center text-gray-500 text-xs mt-6">
-          アカウントをお持ちでないですか？{' '}
-          <Link href="/register" className="text-blue-500 hover:underline">
-            新規登録はこちら
+          すでにアカウントをお持ちですか？{' '}
+          <Link href="/login" className="text-blue-500 hover:underline">
+            ログインはこちら
           </Link>
         </p>
       </div>

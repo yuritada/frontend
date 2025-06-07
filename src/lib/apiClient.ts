@@ -42,7 +42,7 @@ export const login = async (username: string, password: string): Promise<Token> 
  * 新規ユーザーを登録する
  */
 export const register = async (username: string, password: string): Promise<User> => {
-  const response = await fetch(`${API_BASE_URL}/users/register`, {
+  const response = await fetch(`${API_BASE_URL}/register`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
