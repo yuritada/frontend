@@ -32,6 +32,7 @@ export default function HomePage() {
         setPosts(timelinePosts);
       } catch (err) {
         setError('タイムラインの読み込みに失敗しました。');
+        console.error(err);
       } finally {
         setIsLoading(false);
       }
@@ -69,6 +70,7 @@ export default function HomePage() {
 
     } catch (err) {
       setError('方言への変換に失敗しました。');
+      console.error(err);
     } finally {
       setIsTranslating(false);
     }
