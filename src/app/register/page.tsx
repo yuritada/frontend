@@ -18,20 +18,25 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      // APIクライアントを使ってユーザー登録処理を実行
-      await apiClient.register(username, password);
+          // APIクライアントを使ってユーザー登録処理を実行
+          await apiClient.register(username, password);
 
-      // 登録成功後、ログインページにメッセージ付きでリダイレクト
-      router.push('/login?registered=true');
+          // 登録成功後、ログインページにメッセージ付きでリダイレクト
+          router.push('/login?registered=true');
 
-    } catch (err: any) {
-      // ユーザー名重複などのエラーメッセージをstateに保存して表示
-      setError(err.message || '登録に失敗しました。');
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        } catch (err) { // anyを削除 (または unknown を指定)
+          // エラーがErrorインスタンスか確認し、安全にmessageプロパティにアクセスする
+          if (err instanceof Error) {
+            setError(err.message || '登録に失敗しました。');
+          } else {
+            // 予期せぬ形式のエラーの場合
+            setError('登録に失敗しました。');
+          }
+          console.error(err);
+        } finally {
+          setIsLoading(false);
+        }
+      };
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-gray-50">
